@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>LAZIB ABDULLAH — Creative Digital Portfolio & Store</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Syne (Display), Cormorant Garamond (Serif Italic), Plus Jakarta Sans (Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons (Optional Enhancement, Fallback SVGs Included) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Syne', 'sans-serif'],
+            serif: ['Cormorant Garamond', 'serif'],
+          },
+          colors: {
+            dark: '#070b09',
+            forest: '#0d1913',
+            accent: '#f97316',
+            emeraldGlow: '#10b981',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      background-color: #070b09;
+      color: #f3f4f6;
+      overflow-x: hidden;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #070b09; }
+    ::-webkit-scrollbar-thumb { background: #1c3327; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #f97316; }
+
+    /* Hide scrollbar for horizontal tracks */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Frosted Glassmorphism (Inspired by Reference 1 & 3) */
+    .glass-panel {
+      background: rgba(13, 25, 19, 0.76);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .glass-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
+    }
+
+    /* 3D Perspective & Mouse Tilt */
+    .perspective-stage {
+      perspective: 1400px;
+    }
+
+    .tilt-card {
+      transform-style: preserve-3d;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+      will-change: transform;
+    }
+
+    @media (hover: hover) {
+      .tilt-card:hover {
+        border-color: rgba(249, 115, 22, 0.45);
+        box-shadow: 0 26px 60px -12px rgba(249, 115, 22, 0.22), 0 0 30px -10px rgba(16, 185, 129, 0.2);
+      }
+    }
+
+    /* ==========================================================
+       PART 1: 3D COVERFLOW CAROUSEL (Voyage Style Reference 2)
+       ========================================================== */
+    .carousel-3d-stage {
+      perspective: 1200px;
+      transform-style: preserve-3d;
+      position: relative;
+      height: 300px;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      touch-action: pan-y;
+      cursor: grab;
+    }
+    .carousel-3d-stage:active {
+      cursor: grabbing;
+    }
+
+    .carousel-card-3d {
+      position: absolute;
+      width: 190px;
+      height: 265px;
+      border-radius: 18px;
+      overflow: hidden;
+      transition: transform 0.68s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.58s cubic-bezier(0.22, 1, 0.36, 1),
+                  filter 0.58s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.4s ease,
+                  box-shadow 0.58s ease;
+      will-change: transform, opacity, filter;
+      cursor: pointer;
+      box-shadow: 0 25px 55px rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .carousel-card-3d.is-dragging {
+      transition: none !important;
+    }
+
+    .carousel-card-3d.is-active-card {
+      border-color: rgba(249, 115, 22, 0.75);
+      box-shadow: 0 30px 70px -10px rgba(0, 0, 0, 0.92), 0 0 38px -5px rgba(249, 115, 22, 0.35);
+    }
+
+    @media (min-width: 640px) {
+      .carousel-3d-stage { height: 390px; }
+      .carousel-card-3d { width: 260px; height: 355px; }
+    }
+
+    @media (min-width: 1024px) {
+      .carousel-3d-stage { height: 450px; }
+      .carousel-card-3d { width: 310px; height: 420px; }
+    }
+
+    /* Animated Caption Pop */
+    @keyframes captionPop {
+      0% {
+        opacity: 0;
+        transform: translateY(14px) scale(0.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .caption-animate {
+      animation: captionPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* ==========================================================
+       PART 2: SMOOTH HORIZONTAL GALLERY SLIDER & ANIMATIONS
+       ========================================================== */
+    .projects-slider-track {
+      display: flex;
+      gap: 1.25rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      padding: 0.75rem 0.5rem 1.75rem 0.5rem;
+      cursor: grab;
+    }
+    .projects-slider-track:active {
+      cursor: grabbing;
+    }
+    .projects-slider-track.dragging-track {
+      scroll-behavior: auto !important;
+      scroll-snap-type: none !important;
+    }
+
+    .project-slide-item {
+      flex: 0 0 280px;
+      width: 280px;
+      max-width: 82vw;
+      scroll-snap-align: center;
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.5s ease,
+                  border-color 0.35s ease,
+                  box-shadow 0.45s ease;
+      will-change: transform, opacity;
+    }
+
+    @media (min-width: 640px) {
+      .project-slide-item {
+        flex: 0 0 335px;
+        width: 335px;
+        max-width: 335px;
+        scroll-snap-align: start;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .project-slide-item {
+        flex: 0 0 365px;
+        width: 365px;
+        max-width: 365px;
+      }
+    }
+
+    /* Staggered 3D Entrance Animation when Filtering or Loading */
+    @keyframes cardPopIn3D {
+      0% {
+        opacity: 0;
+        transform: perspective(900px) translateY(32px) translateX(22px) scale(0.92) rotateX(6deg);
+      }
+      100% {
+        opacity: 1;
+        transform: perspective(900px) translateY(0) translateX(0) scale(1) rotateX(0deg);
+      }
+    }
+
+    .card-enter-anim {
+      animation: cardPopIn3D 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* Safe Scroll Reveal (Never stuck invisible) */
+    .reveal {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    body.js-anim-ready .reveal:not(.active) {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    body.js-anim-ready .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Hero Background & Text Transition */
+    .hero-bg-zoom {
+      transition: background-image 0.8s ease-in-out, transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes slideFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .slide-fade-enter {
+      animation: slideFadeIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Split Outline Text Effect (Reference 1) */
+    .split-outline-text {
+      color: rgba(255, 255, 255, 0.18);
+      -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.82);
+    }
+  </style>
+</head>
+<body class="selection:bg-orange-500 selection:text-white">
+
+  <!-- ================= FIXED GLASS NAVBAR ================= -->
+  <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between border-b border-white/10 bg-[#070b09]/85 backdrop-blur-xl">
+      <!-- Brand Identity -->
+      <a href="#home" class="flex items-center gap-2.5 group shrink-0">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-orange-500 to-emerald-600 flex items-center justify-center font-display font-bold text-xs sm:text-sm text-white shadow-lg shadow-orange-500/20 group-hover:rotate-6 transition">
+          LA
+        </div>
+        <div>
+          <span class="font-display font-extrabold tracking-wider text-xs sm:text-sm block leading-none text-white">LAZIB ABDULLAH</span>
+          <span class="text-[9px] sm:text-[10px] text-emerald-400 tracking-widest uppercase block mt-0.5">Creative Media & Asset</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden lg:flex items-center gap-6 xl:gap-7 text-xs font-semibold tracking-widest uppercase text-gray-300">
+        <a href="#home" class="hover:text-orange-400 transition">Home</a>
+        <a href="#about" class="hover:text-orange-400 transition">About</a>
+        <a href="#projects" class="hover:text-orange-400 transition">Projects</a>
+        <a href="#products" class="hover:text-orange-400 transition">Products</a>
+        <a href="#services" class="hover:text-orange-400 transition">Services</a>
+        <a href="#workflow" class="hover:text-orange-400 transition">Workflow</a>
+        <button type="button" onclick="toggleJourneyModal()" class="text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 transition font-bold">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          <span>Journey</span>
+        </button>
+        <a href="#contact" class="hover:text-orange-400 transition">Contact</a>
+      </nav>
+
+      <!-- Store CTA & Mobile Hamburger -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="https://lynk.id/zibbbbit__" target="_blank" rel="noopener noreferrer" class="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-accent hover:bg-orange-600 text-white text-[11px] sm:text-xs font-bold tracking-wider uppercase transition shadow-lg shadow-orange-500/30 flex items-center gap-1.5">
+          <span>Store</span>
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
+        </a>
+        <button id="mobile-menu-btn" type="button" aria-label="Toggle Menu" class="lg:hidden p-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 active:scale-95 transition">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="hidden lg:hidden glass-panel border-b border-white/15 px-4 py-4 space-y-1 text-sm font-medium shadow-2xl">
+      <a href="#home" class="mobile-nav-link block py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-orange-400">01. Home</a>
+      <a href="#about" class="mobile-nav-link block py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-orange-400">02. About Me</a>
+      <a href="#projects" class="mobile-nav-link block py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-orange-400">03. My Projects (3D & Slider)</a>
+      <a href="#products" class="mobile-nav-link block py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-orange-400">04. Digital Products</a>
+      <a href="#services" class="mobile-nav-link block py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-orange-400">05. Services</a>
+      <a href="#workflow" class="mobile-nav-link block py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-orange-400">06. Workflow</a>
+      <a href="#contact" class="mobile-nav-link block py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-orange-400">07. Contact</a>
+      <div class="pt-2 border-t border-white/10">
+        <button type="button" onclick="toggleJourneyModal(); closeMobileMenu();" class="w-full text-left py-2.5 px-3 rounded-lg bg-emerald-500/15 text-emerald-300 font-semibold flex items-center justify-between text-xs sm:text-sm">
+          <span>📌 Monetization Journey (Dokumentasi Tugas)</span>
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= 01. HOME — SPLIT FROSTED 3D HERO (Reference 1) ================= -->
+  <section id="home" class="relative min-h-screen flex items-center overflow-hidden pt-20 pb-10 lg:py-0 bg-gradient-to-br from-emerald-950 via-slate-900 to-neutral-950">
+    <!-- Dynamic Background Slide -->
+    <div id="hero-bg" class="absolute inset-0 bg-cover bg-center scale-105 hero-bg-zoom"
+         style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1800&q=80');">
+    </div>
+    <!-- Atmospheric Dark Forest Gradients -->
+    <div class="absolute inset-0 bg-gradient-to-b from-[#070b09]/85 via-[#070b09]/60 to-[#070b09] lg:bg-gradient-to-r lg:from-[#070b09]/90 lg:via-[#070b09]/45 lg:to-[#070b09]/75"></div>
+
+    <!-- Left Split Frosted Glass Panel (Directly inspired by "African Forest" Reference 1) -->
+    <div class="hidden lg:block absolute top-0 left-0 w-[45%] h-full backdrop-blur-md bg-[#0b1911]/45 border-r border-white/15 pointer-events-none z-10">
+      <!-- Decorative Botanical Leaf SVG Accent on the split border -->
+      <svg class="absolute top-24 -right-8 w-16 h-16 text-emerald-400/70 drop-shadow-lg" viewBox="0 0 64 64" fill="currentColor">
+        <path d="M54 10C32 10 14 24 10 48c18-2 36-14 44-38z"/>
+        <path d="M44 28C28 32 16 42 10 54c14-2 26-10 34-26z" opacity="0.6"/>
+      </svg>
+    </div>
+
+    <!-- Main Hero Content Container -->
+    <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-6 lg:py-24 w-full grid lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+      
+      <!-- Left & Center Split Typography -->
+      <div class="lg:col-span-10 space-y-4 sm:space-y-6" id="hero-content-box">
+        
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs uppercase tracking-widest text-emerald-300 font-semibold max-w-full">
+          <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping shrink-0"></span>
+          <span id="hero-subtitle" class="truncate">CREATIVE DIGITAL PORTFOLIO • VISUAL STORYTELLING</span>
+        </div>
+
+        <!-- Giant Split-Tone Display Headline -->
+        <div class="space-y-1">
+          <p class="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-orange-400 font-bold" id="hero-kicker">
+            LAZIB ABDULLAH — CREATIVE MEDIA & DIGITAL ASSET
+          </p>
+          <h1 class="font-display font-extrabold text-[28px] sm:text-5xl md:text-6xl xl:text-7xl leading-[1.1] tracking-tight">
+            <span id="hero-line-1" class="block">
+              <span class="split-outline-text">TURNING</span> <span class="text-white">IDEAS</span>
+            </span>
+            <span id="hero-line-2" class="bg-gradient-to-r from-emerald-300 via-white to-orange-400 bg-clip-text text-transparent block mt-1">
+              INTO VISUAL EXPERIENCES.
+            </span>
+          </h1>
+        </div>
+
+        <!-- Creator Description -->
+        <p id="hero-desc" class="max-w-2xl text-gray-200 text-xs sm:text-base lg:text-lg leading-relaxed font-light">
+          Saya adalah mahasiswa <strong class="text-white font-semibold">D4 Produksi Media</strong> yang berfokus pada pengembangan karya kreatif melalui desain visual, fotografi, video <em>cinematic</em>, dan media digital.
+        </p>
+
+        <!-- Primary Action Buttons -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-1">
+          <a href="#projects" class="px-6 py-3.5 sm:px-7 sm:py-4 rounded-full bg-accent hover:bg-orange-600 text-white font-bold text-xs sm:text-sm tracking-wider uppercase transition shadow-xl shadow-orange-500/30 flex items-center justify-center gap-2.5 group">
+            <span>Explore My Work</span>
+            <svg class="w-4 h-4 group-hover:rotate-45 transition duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          </a>
+          <a href="#services" class="px-6 py-3.5 sm:px-7 sm:py-4 rounded-full glass-panel hover:bg-white/15 text-white font-bold text-xs sm:text-sm tracking-wider uppercase transition flex items-center justify-center gap-2.5 border border-white/20">
+            <span>View My Services</span>
+            <svg class="w-4 h-4 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z"/></svg>
+          </a>
+          <a href="#products" class="px-5 py-3.5 sm:py-4 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+            <span>Digital Products</span>
+          </a>
+        </div>
+
+        <!-- Identity & Focus Quick Bento -->
+        <div class="pt-3 sm:pt-6 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5 max-w-3xl perspective-stage">
+          <div class="glass-card p-3 sm:p-3.5 rounded-2xl tilt-card">
+            <span class="text-[10px] sm:text-[11px] text-gray-400 block">Fokus Utama</span>
+            <span class="text-xs sm:text-sm font-bold text-white">Visual & Cinematic</span>
+          </div>
+          <div class="glass-card p-3 sm:p-3.5 rounded-2xl tilt-card">
+            <span class="text-[10px] sm:text-[11px] text-gray-400 block">Pendidikan</span>
+            <span class="text-xs sm:text-sm font-bold text-emerald-400">D4 Produksi Media</span>
+          </div>
+          <div class="glass-card p-3 sm:p-3.5 rounded-2xl tilt-card">
+            <span class="text-[10px] sm:text-[11px] text-gray-400 block">Produk Digital</span>
+            <span class="text-xs sm:text-sm font-bold text-orange-400">Ready-to-Use Asset</span>
+          </div>
+          <div class="glass-card p-3 sm:p-3.5 rounded-2xl tilt-card">
+            <span class="text-[10px] sm:text-[11px] text-gray-400 block">Target Klien</span>
+            <span class="text-xs sm:text-sm font-bold text-white">Kreator & UMKM</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Vertical Diamond Slide Indicator & Bottom Square Arrows (Reference 1) -->
+      <div class="lg:col-span-2 flex lg:flex-col items-center justify-between lg:justify-center gap-4 pt-3 lg:pt-0 border-t border-white/10 lg:border-none">
+        <div class="hidden lg:block w-[1.5px] h-16 bg-white/35"></div>
+        
+        <!-- 3 Diamond Slide Indicators -->
+        <div class="flex lg:flex-col items-center gap-4" id="hero-diamonds">
+          <button type="button" onclick="setHeroSlide(0)" aria-label="Slide 1" class="w-3.5 h-3.5 rotate-45 bg-orange-500 transition-all scale-125 shadow-lg shadow-orange-500/50"></button>
+          <button type="button" onclick="setHeroSlide(1)" aria-label="Slide 2" class="w-3.5 h-3.5 rotate-45 border border-white/70 hover:bg-white/40 transition-all"></button>
+          <button type="button" onclick="setHeroSlide(2)" aria-label="Slide 3" class="w-3.5 h-3.5 rotate-45 border border-white/70 hover:bg-white/40 transition-all"></button>
+        </div>
+
+        <div class="hidden lg:block w-[1.5px] h-16 bg-white/35"></div>
+
+        <!-- Square Prev / Next Buttons -->
+        <div class="flex gap-2.5 lg:pt-2">
+          <button type="button" onclick="changeHeroSlide(-1)" aria-label="Previous Slide" class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-white/15 active:bg-orange-500 hover:bg-orange-500 backdrop-blur-md border border-white/20 flex items-center justify-center transition text-white">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <button type="button" onclick="changeHeroSlide(1)" aria-label="Next Slide" class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-black/50 active:bg-orange-500 hover:bg-orange-500 backdrop-blur-md border border-white/20 flex items-center justify-center transition text-white">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 02. ABOUT ME — TENTANG SAYA ================= -->
+  <section id="about" class="py-16 sm:py-24 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        
+        <!-- Left Visual Bento Card -->
+        <div class="lg:col-span-5 reveal">
+          <div class="relative rounded-3xl overflow-hidden glass-card p-2.5 sm:p-3 tilt-card">
+            <div class="relative h-[300px] sm:h-[420px] rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-900 to-neutral-950">
+              <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80" 
+                   alt="Lazib Abdullah - Mountain Exploration" 
+                   onerror="this.style.opacity='0'"
+                   class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+              
+              <!-- Floating Badge -->
+              <div class="absolute top-3 left-3 sm:top-4 sm:left-4 px-3 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-[11px] text-emerald-300 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>Visual Storyteller & Explorer</span>
+              </div>
+
+              <!-- Bottom Overlay Text -->
+              <div class="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5">
+                <p class="font-serif italic text-xl sm:text-2xl text-orange-300">"Calm Outside, Creative Inside"</p>
+                <h3 class="font-display font-bold text-lg sm:text-xl text-white mt-0.5">Lazib Abdullah</h3>
+                <p class="text-[11px] sm:text-xs text-gray-300 mt-0.5">Mahasiswa D4 Produksi Media • Creative Media & Digital Asset</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Description & Skills Matrix -->
+        <div class="lg:col-span-7 space-y-4 sm:space-y-6 reveal">
+          <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-orange-400">
+            <span>02 / ABOUT ME — TENTANG SAYA</span>
+            <span class="w-8 h-[1px] bg-orange-400"></span>
+          </div>
+
+          <h2 class="font-display text-2xl sm:text-4xl font-bold leading-tight">
+            Memadukan Estetika Alam, <span class="font-serif italic font-normal text-emerald-300">Visual Storytelling</span>, dan Solusi Media Digital.
+          </h2>
+
+          <p class="text-gray-300 leading-relaxed text-xs sm:text-base">
+            Halo! Saya <strong>Lazib Abdullah</strong>, mahasiswa <strong>D4 Produksi Media</strong> yang memiliki ketertarikan mendalam pada dunia kreatif dan pengembangan aset digital. Saya berfokus mengubah ide serta momen perjalanan menjadi karya visual yang bernilai—mulai dari desain grafis, fotografi lanskap pegunungan, pengeditan video <em>cinematic</em>, hingga pembuatan website portofolio untuk kreator konten, fotografer pemula, <em>traveler</em>, dan pelaku UMKM.
+          </p>
+
+          <!-- Skills Grid (4 Pillars) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 pt-2 perspective-stage">
+            
+            <div class="glass-card p-4 sm:p-5 rounded-2xl tilt-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="p-2 rounded-xl bg-orange-500/15 text-orange-400">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+                </span>
+                <span class="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Bidang 01</span>
+              </div>
+              <h4 class="font-bold text-base sm:text-lg text-white">Graphic Design</h4>
+              <p class="text-xs text-gray-400 mt-1">Canva, layout, visual design, tipografi & branding konten media sosial.</p>
+            </div>
+
+            <div class="glass-card p-4 sm:p-5 rounded-2xl tilt-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="p-2 rounded-xl bg-emerald-500/15 text-emerald-400">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                </span>
+                <span class="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Bidang 02</span>
+              </div>
+              <h4 class="font-bold text-base sm:text-lg text-white">Photography</h4>
+              <p class="text-xs text-gray-400 mt-1">Travel & <em>landscape photography</em>, eksplorasi pegunungan & dokumentasi.</p>
+            </div>
+
+            <div class="glass-card p-4 sm:p-5 rounded-2xl tilt-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="p-2 rounded-xl bg-blue-500/15 text-blue-400">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18M17 3v18M3 7.5h4M17 7.5h4M3 12h18M3 16.5h4M17 16.5h4"/></svg>
+                </span>
+                <span class="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Bidang 03</span>
+              </div>
+              <h4 class="font-bold text-base sm:text-lg text-white">Video Editing</h4>
+              <p class="text-xs text-gray-400 mt-1">Cinematic editing, <em>color grading</em> atmosferik, & <em>visual pacing</em>.</p>
+            </div>
+
+            <div class="glass-card p-4 sm:p-5 rounded-2xl tilt-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="p-2 rounded-xl bg-purple-500/15 text-purple-400">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
+                </span>
+                <span class="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Bidang 04</span>
+              </div>
+              <h4 class="font-bold text-base sm:text-lg text-white">Digital Media</h4>
+              <p class="text-xs text-gray-400 mt-1">Website portofolio interaktif, mockup produk, dan konten digital.</p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 03. MY PROJECTS — GALERI KARYA (3D VOYAGE SLIDER & SMOOTH HORIZONTAL CATALOG) ================= -->
+  <section id="projects" class="py-16 sm:py-24 relative bg-gradient-to-b from-transparent via-forest/50 to-transparent overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      
+      <!-- Section Heading -->
+      <div class="text-center max-w-3xl mx-auto mb-6 sm:mb-10 reveal">
+        <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-orange-400 mb-2">
+          <span>03 / MY PROJECTS — GALERI KARYA</span>
+        </div>
+        <h2 class="font-display text-2xl sm:text-5xl font-extrabold leading-tight">
+          3D Visual Showcase & <span class="text-emerald-400">Galeri Karya Interaktif</span>
+        </h2>
+        <p class="text-gray-400 text-xs sm:text-base mt-2">
+          Geser (<em>swipe</em> kiri/kanan) kartu 3D maupun katalog 13 karya di bawah ini dengan animasi transisi yang halus.
+        </p>
+      </div>
+
+      <!-- PART 1: ULTRA-SMOOTH 3D PERSPECTIVE CAROUSEL (Voyage Style Reference 2) -->
+      <div class="relative my-2 sm:my-6 reveal">
+        <div class="carousel-3d-stage" id="carousel-3d">
+          <!-- Persistent 3D Cards injected once & animated via hardware-accelerated CSS transforms -->
+        </div>
+
+        <!-- Centered Overlapping Typography with Smooth Pop Animation -->
+        <div id="c3d-caption-box" class="relative z-30 mt-2 sm:-mt-20 text-center px-3 flex flex-col items-center caption-animate">
+          <span id="c3d-tag" class="inline-block px-3.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-orange-500/40 text-[10px] sm:text-[11px] uppercase tracking-widest text-orange-300 mb-1.5 shadow-lg">
+            #A. Digital Design
+          </span>
+          <h3 id="c3d-title" class="font-display font-extrabold text-lg sm:text-3xl lg:text-4xl tracking-wider uppercase text-white drop-shadow-[0_6px_24px_rgba(0,0,0,0.95)] max-w-xl">
+            TEMPLATE AIR TERJUN 7 SLIDE
+          </h3>
+          <div class="w-12 h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent mx-auto my-1.5"></div>
+          <p id="c3d-sub" class="text-xs sm:text-sm text-gray-200 max-w-md mx-auto drop-shadow">
+            Discover the world, one journey at a time — Carousel microblog bertema alam
+          </p>
+        </div>
+
+        <!-- Interactive Pagination Dots & Controls -->
+        <div class="relative z-30 flex items-center justify-center gap-4 mt-4">
+          <button type="button" onclick="move3DCarousel(-1)" aria-label="Geser 3D Kiri" class="w-10 h-10 rounded-full glass-panel hover:bg-orange-500 active:scale-90 text-white flex items-center justify-center transition shadow-lg">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+
+          <div id="c3d-dots" class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-black/50 border border-white/10 backdrop-blur-md">
+            <!-- Dots injected by JS -->
+          </div>
+
+          <button type="button" onclick="move3DCarousel(1)" aria-label="Geser 3D Kanan" class="w-10 h-10 rounded-full glass-panel hover:bg-orange-500 active:scale-90 text-white flex items-center justify-center transition shadow-lg">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <!-- Desktop Floating Side Arrows -->
+        <button type="button" onclick="move3DCarousel(-1)" aria-label="Slide Left" class="hidden sm:flex absolute left-2 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full glass-panel hover:bg-orange-500 hover:scale-110 active:scale-95 text-white items-center justify-center transition duration-300 shadow-2xl">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button type="button" onclick="move3DCarousel(1)" aria-label="Slide Right" class="hidden sm:flex absolute right-2 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full glass-panel hover:bg-orange-500 hover:scale-110 active:scale-95 text-white items-center justify-center transition duration-300 shadow-2xl">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <!-- PART 2: CATEGORY FILTER TABS & SMOOTH SLIDER CONTROLS -->
+      <div class="mt-12 sm:mt-16 mb-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 reveal">
+        
+        <!-- Horizontal Scrollable Category Filter Buttons -->
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          <button type="button" onclick="filterProjects('all')" class="proj-tab shrink-0 px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-accent text-white transition shadow-lg shadow-orange-500/25" data-filter="all">
+            Semua Karya (13)
+          </button>
+          <button type="button" onclick="filterProjects('design')" class="proj-tab shrink-0 px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider glass-panel hover:bg-white/10 text-gray-300 transition" data-filter="design">
+            A. Digital Design (6)
+          </button>
+          <button type="button" onclick="filterProjects('photo')" class="proj-tab shrink-0 px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider glass-panel hover:bg-white/10 text-gray-300 transition" data-filter="photo">
+            B. Photography & Cinematic (4)
+          </button>
+          <button type="button" onclick="filterProjects('platform')" class="proj-tab shrink-0 px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider glass-panel hover:bg-white/10 text-gray-300 transition" data-filter="platform">
+            C. Digital Platform (3)
+          </button>
+        </div>
+
+        <!-- Slider Navigation & Layout Switcher (Mode Geser vs Mode Grid) -->
+        <div class="flex items-center justify-between sm:justify-end gap-2.5">
+          <button id="toggle-layout-btn" type="button" onclick="toggleGalleryLayout()" class="px-3.5 py-2.5 rounded-xl glass-panel hover:border-orange-400/50 text-xs font-semibold text-emerald-300 flex items-center gap-2 transition">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            <span id="layout-label">Tampilkan Semua (Grid)</span>
+          </button>
+
+          <!-- Smooth Left/Right Gallery Slider Buttons -->
+          <div id="gallery-slider-arrows" class="flex items-center gap-2">
+            <button type="button" onclick="scrollGalleryTrack(-1)" aria-label="Geser Galeri ke Kiri" class="w-10 h-10 rounded-xl glass-panel hover:bg-orange-500 active:scale-90 text-white flex items-center justify-center transition">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <button type="button" onclick="scrollGalleryTrack(1)" aria-label="Geser Galeri ke Kanan" class="w-10 h-10 rounded-xl glass-panel hover:bg-orange-500 active:scale-90 text-white flex items-center justify-center transition">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Smooth Progress Bar Indicator for Horizontal Gallery -->
+      <div id="gallery-progress-wrap" class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mb-5">
+        <div id="gallery-progress-bar" class="h-full bg-gradient-to-r from-orange-500 to-emerald-400 rounded-full transition-all duration-300" style="width: 25%;"></div>
+      </div>
+
+      <!-- Projects Container (Smooth Horizontal Swipe Slider by Default, Toggleable to Grid) -->
+      <div id="projects-grid" class="projects-slider-track no-scrollbar perspective-stage">
+        <!-- Populated dynamically via JS with all 13 projects & staggered 3D animations -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 04. DIGITAL PRODUCTS — PRODUK DIGITAL ================= -->
+  <section id="products" class="py-16 sm:py-24 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4 reveal">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-orange-400 mb-2">
+            <span>04 / DIGITAL PRODUCTS — PRODUK DIGITAL</span>
+            <span class="w-8 h-[1px] bg-orange-400"></span>
+          </div>
+          <h2 class="font-display text-2xl sm:text-5xl font-extrabold">
+            Aset Digital Siap Pakai
+          </h2>
+          <p class="text-gray-400 text-xs sm:text-base mt-2 max-w-xl">
+            Aset kreatif yang dirancang untuk membantu kreator konten, <em>traveler</em>, dan UMKM memproduksi visual berkualitas secara cepat dan efisien.
+          </p>
+        </div>
+
+        <button type="button" onclick="toggleJourneyModal()" class="self-start md:self-auto px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs hover:bg-emerald-500/20 transition flex items-center gap-2 font-semibold">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>Catatan Hipotesis Harga Awal (Tugas)</span>
+        </button>
+      </div>
+
+      <!-- 3 Main Products Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 perspective-stage">
+        
+        <!-- Product 1: Template IG Carousel Travel -->
+        <div class="glass-card rounded-3xl overflow-hidden flex flex-col justify-between tilt-card reveal">
+          <div>
+            <div class="relative h-48 sm:h-56 overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-900 to-neutral-950">
+              <img src="https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=900&q=80" 
+                   alt="Template IG Carousel Travel" 
+                   onerror="this.style.opacity='0'"
+                   class="w-full h-full object-cover hover:scale-105 transition duration-700" />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#070b09] via-transparent to-transparent"></div>
+              <span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-orange-500 text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Best Seller</span>
+              <span class="absolute bottom-3 right-3.5 px-3 py-1 rounded-lg bg-black/80 backdrop-blur-md text-emerald-300 font-bold text-xs sm:text-sm border border-white/15">
+                Rp10.000 – Rp15.000
+              </span>
+            </div>
+
+            <div class="p-5 sm:p-6 space-y-3">
+              <h3 class="font-display text-lg sm:text-xl font-bold text-white">Template IG Carousel Travel</h3>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                <strong>Manfaat:</strong> Mengubah foto perjalanan, air terjun, dan pendakian menjadi konten <em>microblog</em> 7 slide bergaya <em>dark glassmorphism</em> yang rapi dan menarik <em>engagement</em>.
+              </p>
+              
+              <div class="space-y-2 pt-2.5 border-t border-white/10 text-xs text-gray-400">
+                <div class="flex justify-between gap-2">
+                  <span>Format Produk:</span>
+                  <span class="text-white font-medium text-right">Canva Editable Link (7 Slide)</span>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <span>Cara Mendapatkan:</span>
+                  <span class="text-emerald-400 font-medium text-right">Akses Instan via Lynk.id / WA</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 sm:p-6 pt-0">
+            <a href="https://lynk.id/zibbbbit__" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 rounded-xl bg-accent hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg shadow-orange-500/20">
+              <span>Pesan Produk Sekarang</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Product 2: Video Cinematic -->
+        <div class="glass-card rounded-3xl overflow-hidden flex flex-col justify-between tilt-card reveal">
+          <div>
+            <div class="relative h-48 sm:h-56 overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-900 to-neutral-950">
+              <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80" 
+                   alt="Video Cinematic" 
+                   onerror="this.style.opacity='0'"
+                   class="w-full h-full object-cover hover:scale-105 transition duration-700" />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#070b09] via-transparent to-transparent"></div>
+              <span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Cinematic Asset</span>
+              <span class="absolute bottom-3 right-3.5 px-3 py-1 rounded-lg bg-black/80 backdrop-blur-md text-emerald-300 font-bold text-xs sm:text-sm border border-white/15">
+                Rp20.000 – Rp25.000
+              </span>
+            </div>
+
+            <div class="p-5 sm:p-6 space-y-3">
+              <h3 class="font-display text-lg sm:text-xl font-bold text-white">Video Cinematic & Grading Pack</h3>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                <strong>Manfaat:</strong> Menghadirkan <em>mood</em> warna filmis (<em>Forest Moody & Golden Hour</em>), stok <em>footage</em> lanskap alam, serta template transisi CapCut untuk Reels & TikTok.
+              </p>
+              
+              <div class="space-y-2 pt-2.5 border-t border-white/10 text-xs text-gray-400">
+                <div class="flex justify-between gap-2">
+                  <span>Format Produk:</span>
+                  <span class="text-white font-medium text-right">MP4 1080p/4K + Preset CapCut</span>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <span>Cara Mendapatkan:</span>
+                  <span class="text-emerald-400 font-medium text-right">Unduh Google Drive via Lynk.id</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 sm:p-6 pt-0">
+            <a href="https://lynk.id/zibbbbit__" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 rounded-xl bg-accent hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg shadow-orange-500/20">
+              <span>Pesan Produk Sekarang</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Product 3: Website Portofolio -->
+        <div class="glass-card rounded-3xl overflow-hidden flex flex-col justify-between tilt-card reveal">
+          <div>
+            <div class="relative h-48 sm:h-56 overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-900 to-neutral-950">
+              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=900&q=80" 
+                   alt="Website Portofolio" 
+                   onerror="this.style.opacity='0'"
+                   class="w-full h-full object-cover hover:scale-105 transition duration-700" />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#070b09] via-transparent to-transparent"></div>
+              <span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-purple-600 text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Web Template</span>
+              <span class="absolute bottom-3 right-3.5 px-3 py-1 rounded-lg bg-black/80 backdrop-blur-md text-emerald-300 font-bold text-xs sm:text-sm border border-white/15">
+                Rp30.000
+              </span>
+            </div>
+
+            <div class="p-5 sm:p-6 space-y-3">
+              <h3 class="font-display text-lg sm:text-xl font-bold text-white">Website Portofolio</h3>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                <strong>Manfaat:</strong> Meningkatkan kredibilitas <em>personal branding</em> di mata calon klien dengan tampilan website <em>Dark Minimalist</em> responsif yang siap dipublikasikan.
+              </p>
+              
+              <div class="space-y-2 pt-2.5 border-t border-white/10 text-xs text-gray-400">
+                <div class="flex justify-between gap-2">
+                  <span>Format Produk:</span>
+                  <span class="text-white font-medium text-right">Source Code HTML / Canva Web</span>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <span>Cara Mendapatkan:</span>
+                  <span class="text-emerald-400 font-medium text-right">File + Panduan via Lynk.id / WA</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 sm:p-6 pt-0">
+            <a href="https://lynk.id/zibbbbit__" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 rounded-xl bg-accent hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg shadow-orange-500/20">
+              <span>Pesan Produk Sekarang</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 05. SERVICES — JASA KREATIF ================= -->
+  <section id="services" class="py-16 sm:py-24 relative bg-forest/30 border-y border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      
+      <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-16 reveal">
+        <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-orange-400 mb-2">
+          <span>05 / SERVICES — JASA KREATIF</span>
+        </div>
+        <h2 class="font-display text-2xl sm:text-5xl font-extrabold">
+          Layanan Kreatif Kustom
+        </h2>
+        <p class="text-gray-400 text-xs sm:text-base mt-2">
+          Selain produk digital siap pakai, saya juga membuka layanan pengerjaan kustom sesuai kebutuhan spesifik <em>brand</em>, konten perjalanan, atau bisnis UMKM Anda.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 perspective-stage">
+        
+        <!-- Service 1 -->
+        <div class="glass-card p-5 sm:p-6 rounded-3xl flex flex-col justify-between tilt-card reveal">
+          <div>
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-4 font-display font-bold">
+              01
+            </div>
+            <span class="text-[10px] sm:text-[11px] text-gray-400 uppercase tracking-widest">Jasa Kreatif 01</span>
+            <h3 class="font-display font-bold text-lg sm:text-xl text-white mt-1">Custom Instagram Carousel</h3>
+            <p class="text-xs text-gray-300 mt-2.5 leading-relaxed">
+              Membuat desain <em>carousel</em> sesuai kebutuhan klien, mulai dari konten edukasi, <em>visual storytelling</em> perjalanan, hingga promosi produk.
+            </p>
+          </div>
+          <a href="https://wa.me/6281229739347?text=Halo%20Lazib,%20saya%20ingin%20memesan%20jasa%20Custom%20Instagram%20Carousel" target="_blank" rel="noopener noreferrer" class="mt-5 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-accent text-white text-xs font-bold uppercase tracking-wider flex items-center justify-between transition">
+            <span>Order Service</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Service 2 -->
+        <div class="glass-card p-5 sm:p-6 rounded-3xl flex flex-col justify-between tilt-card reveal">
+          <div>
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 font-display font-bold">
+              02
+            </div>
+            <span class="text-[10px] sm:text-[11px] text-gray-400 uppercase tracking-widest">Jasa Kreatif 02</span>
+            <h3 class="font-display font-bold text-lg sm:text-xl text-white mt-1">Video Editing</h3>
+            <p class="text-xs text-gray-300 mt-2.5 leading-relaxed">
+              Mengedit video perjalanan, dokumentasi luar ruang, atau konten media sosial (Reels/TikTok) dengan <em>color grading</em> sinematik.
+            </p>
+          </div>
+          <a href="https://wa.me/6281229739347?text=Halo%20Lazib,%20saya%20ingin%20memesan%20jasa%20Video%20Editing" target="_blank" rel="noopener noreferrer" class="mt-5 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-accent text-white text-xs font-bold uppercase tracking-wider flex items-center justify-between transition">
+            <span>Order Service</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Service 3 -->
+        <div class="glass-card p-5 sm:p-6 rounded-3xl flex flex-col justify-between tilt-card reveal">
+          <div>
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-4 font-display font-bold">
+              03
+            </div>
+            <span class="text-[10px] sm:text-[11px] text-gray-400 uppercase tracking-widest">Jasa Kreatif 03</span>
+            <h3 class="font-display font-bold text-lg sm:text-xl text-white mt-1">Portfolio Website</h3>
+            <p class="text-xs text-gray-300 mt-2.5 leading-relaxed">
+              Membuat website sederhana dan modern untuk <em>personal branding</em> kreator, mahasiswa, maupun katalog produk UMKM.
+            </p>
+          </div>
+          <a href="https://wa.me/6281229739347?text=Halo%20Lazib,%20saya%20ingin%20memesan%20jasa%20Portfolio%20Website" target="_blank" rel="noopener noreferrer" class="mt-5 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-accent text-white text-xs font-bold uppercase tracking-wider flex items-center justify-between transition">
+            <span>Order Service</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Service 4 -->
+        <div class="glass-card p-5 sm:p-6 rounded-3xl flex flex-col justify-between tilt-card reveal">
+          <div>
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-4 font-display font-bold">
+              04
+            </div>
+            <span class="text-[10px] sm:text-[11px] text-gray-400 uppercase tracking-widest">Jasa Kreatif 04</span>
+            <h3 class="font-display font-bold text-lg sm:text-xl text-white mt-1">Graphic Design</h3>
+            <p class="text-xs text-gray-300 mt-2.5 leading-relaxed">
+              Membuat poster digital, <em>banner</em> kegiatan, daftar menu makanan & minuman, infografis, serta konten promosi.
+            </p>
+          </div>
+          <a href="https://wa.me/6281229739347?text=Halo%20Lazib,%20saya%20ingin%20memesan%20jasa%20Graphic%20Design" target="_blank" rel="noopener noreferrer" class="mt-5 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-accent text-white text-xs font-bold uppercase tracking-wider flex items-center justify-between transition">
+            <span>Order Service</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 06. WORKFLOW — PROSES KREATIF ================= -->
+  <section id="workflow" class="py-16 sm:py-24 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      
+      <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-16 reveal">
+        <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-orange-400 mb-2">
+          <span>06 / WORKFLOW — PROSES KREATIF</span>
+        </div>
+        <h2 class="font-display text-2xl sm:text-5xl font-extrabold">
+          Alur Produksi Karya
+        </h2>
+        <p class="text-gray-400 text-xs sm:text-base mt-2">
+          Memahami proses produksi secara menyeluruh—bukan sekadar menggunakan aplikasi—untuk memastikan setiap karya memiliki konsep yang kuat.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 relative perspective-stage">
+        
+        <div class="glass-card p-5 sm:p-6 rounded-3xl relative overflow-hidden tilt-card reveal">
+          <span class="font-display font-extrabold text-5xl sm:text-6xl text-white/5 absolute -top-2 -right-2 select-none">01</span>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-orange-500 text-white font-bold flex items-center justify-center text-xs sm:text-sm mb-3.5">1</div>
+          <h3 class="font-display font-bold text-base sm:text-lg text-white">Research & Planning</h3>
+          <p class="text-xs text-gray-300 mt-2 leading-relaxed">
+            Mencari referensi visual, memahami kebutuhan target audiens atau klien, dan menentukan konsep utama karya.
+          </p>
+        </div>
+
+        <div class="glass-card p-5 sm:p-6 rounded-3xl relative overflow-hidden tilt-card reveal">
+          <span class="font-display font-extrabold text-5xl sm:text-6xl text-white/5 absolute -top-2 -right-2 select-none">02</span>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs sm:text-sm mb-3.5">2</div>
+          <h3 class="font-display font-bold text-base sm:text-lg text-white">Creative Development</h3>
+          <p class="text-xs text-gray-300 mt-2 leading-relaxed">
+            Menyusun kerangka ide, tata letak (<em>layout</em>), komposisi desain, serta menentukan arah elemen visual.
+          </p>
+        </div>
+
+        <div class="glass-card p-5 sm:p-6 rounded-3xl relative overflow-hidden tilt-card reveal">
+          <span class="font-display font-extrabold text-5xl sm:text-6xl text-white/5 absolute -top-2 -right-2 select-none">03</span>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-orange-500 text-white font-bold flex items-center justify-center text-xs sm:text-sm mb-3.5">3</div>
+          <h3 class="font-display font-bold text-base sm:text-lg text-white">Production</h3>
+          <p class="text-xs text-gray-300 mt-2 leading-relaxed">
+            Mengeksekusi pembuatan desain grafis, mengedit video <em>cinematic</em>, atau membangun struktur website portofolio.
+          </p>
+        </div>
+
+        <div class="glass-card p-5 sm:p-6 rounded-3xl relative overflow-hidden tilt-card reveal">
+          <span class="font-display font-extrabold text-5xl sm:text-6xl text-white/5 absolute -top-2 -right-2 select-none">04</span>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs sm:text-sm mb-3.5">4</div>
+          <h3 class="font-display font-bold text-base sm:text-lg text-white">Review & Finalization</h3>
+          <p class="text-xs text-gray-300 mt-2 leading-relaxed">
+            Melakukan evaluasi kualitas detail visual, penyesuaian akhir, dan menyiapkan file hasil akhir untuk klien/audiens.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 07. CONTACT — HUBUNGI SAYA ================= -->
+  <section id="contact" class="py-16 sm:py-24 relative overflow-hidden">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="glass-card rounded-3xl sm:rounded-[32px] p-6 sm:p-12 lg:p-14 relative overflow-hidden border border-white/15 reveal">
+        
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="grid lg:grid-cols-12 gap-8 lg:gap-10 items-center relative z-10">
+          
+          <div class="lg:col-span-7 space-y-3.5 sm:space-y-4">
+            <span class="text-xs font-bold uppercase tracking-widest text-orange-400">07 / CONTACT — HUBUNGI SAYA</span>
+            <h2 class="font-display text-2xl sm:text-5xl font-extrabold leading-tight">
+              Have a Project in Mind?
+            </h2>
+            <p class="font-serif italic text-xl sm:text-3xl text-emerald-300">
+              Let's create something meaningful together.
+            </p>
+            <p class="text-gray-300 text-xs sm:text-base max-w-xl pt-1">
+              Siap memesan produk digital, menggunakan jasa desain/editing, atau berkolaborasi dalam proyek kreatif? Hubungi saya melalui kanal resmi berikut:
+            </p>
+
+            <div class="pt-3 flex flex-col sm:flex-row gap-3">
+              <a href="https://wa.me/6281229739347" target="_blank" rel="noopener noreferrer" class="px-5 py-3.5 rounded-full bg-accent hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg shadow-orange-500/25">
+                <span>WhatsApp: 081229739347</span>
+              </a>
+              <a href="https://lynk.id/zibbbbit__" target="_blank" rel="noopener noreferrer" class="px-5 py-3.5 rounded-full glass-panel hover:bg-white/15 text-emerald-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition">
+                <span>Lynk.id Store</span>
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Contact Channels List -->
+          <div class="lg:col-span-5 space-y-2.5 sm:space-y-3">
+            <a href="mailto:forntght24@gmail.com" class="glass-panel p-3.5 sm:p-4 rounded-2xl flex items-center justify-between hover:border-orange-400/50 transition group">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="p-2.5 rounded-xl bg-white/5 text-orange-400 shrink-0 font-bold text-xs">@</div>
+                <div class="min-w-0">
+                  <span class="text-[10px] sm:text-[11px] text-gray-400 block">Email</span>
+                  <span class="text-xs sm:text-sm font-semibold text-white truncate block">forntght24@gmail.com</span>
+                </div>
+              </div>
+              <svg class="w-4 h-4 text-gray-400 group-hover:text-orange-400 transition shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            </a>
+
+            <a href="https://instagram.com/lazibabdullah__" target="_blank" rel="noopener noreferrer" class="glass-panel p-3.5 sm:p-4 rounded-2xl flex items-center justify-between hover:border-orange-400/50 transition group">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="p-2.5 rounded-xl bg-white/5 text-pink-400 shrink-0 font-bold text-xs">IG</div>
+                <div class="min-w-0">
+                  <span class="text-[10px] sm:text-[11px] text-gray-400 block">Instagram</span>
+                  <span class="text-xs sm:text-sm font-semibold text-white truncate block">@lazibabdullah__</span>
+                </div>
+              </div>
+              <svg class="w-4 h-4 text-gray-400 group-hover:text-orange-400 transition shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            </a>
+
+            <a href="https://tiktok.com/@forntght4" target="_blank" rel="noopener noreferrer" class="glass-panel p-3.5 sm:p-4 rounded-2xl flex items-center justify-between hover:border-orange-400/50 transition group">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="p-2.5 rounded-xl bg-white/5 text-cyan-400 shrink-0 font-bold text-xs">TT</div>
+                <div class="min-w-0">
+                  <span class="text-[10px] sm:text-[11px] text-gray-400 block">TikTok</span>
+                  <span class="text-xs sm:text-sm font-semibold text-white truncate block">@forntght4</span>
+                </div>
+              </div>
+              <svg class="w-4 h-4 text-gray-400 group-hover:text-orange-400 transition shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            </a>
+
+            <a href="https://lynk.id/zibbbbit__" target="_blank" rel="noopener noreferrer" class="glass-panel p-3.5 sm:p-4 rounded-2xl flex items-center justify-between hover:border-emerald-400/50 transition group">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="p-2.5 rounded-xl bg-white/5 text-emerald-400 shrink-0 font-bold text-xs">LK</div>
+                <div class="min-w-0">
+                  <span class="text-[10px] sm:text-[11px] text-gray-400 block">Platform Penjualan</span>
+                  <span class="text-xs sm:text-sm font-semibold text-emerald-300 truncate block">https://lynk.id/zibbbbit__</span>
+                </div>
+              </div>
+              <svg class="w-4 h-4 text-gray-400 group-hover:text-emerald-400 transition shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="border-t border-white/10 py-8 text-center text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>© 2026 <strong class="text-gray-300">Lazib Abdullah</strong> — Creative Digital Portfolio (D4 Produksi Media).</p>
+      <button type="button" onclick="toggleJourneyModal()" class="text-emerald-400 hover:underline flex items-center gap-1.5 font-semibold">
+        <span>Buka Dokumentasi Monetization Journey (Akademik)</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- ================= MODAL 1: PROJECT PREVIEW DETAIL ================= -->
+  <div id="project-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-lg flex items-center justify-center p-3 sm:p-4">
+    <div class="glass-card max-w-xl w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-white/20 max-h-[90vh] flex flex-col">
+      <div class="relative h-52 sm:h-64 bg-gradient-to-br from-emerald-950 via-slate-900 to-neutral-950 shrink-0">
+        <img id="pmodal-img" src="" alt="Preview Karya" onerror="this.style.opacity='0'" class="w-full h-full object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-t from-[#070b09] via-black/20 to-transparent"></div>
+        <span id="pmodal-cat" class="absolute top-4 left-4 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-[10px] font-bold uppercase tracking-wider text-emerald-300"></span>
+        <button type="button" onclick="closeProjectModal()" aria-label="Tutup Preview" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/70 hover:bg-red-500/80 text-white flex items-center justify-center transition">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-5 sm:p-6 overflow-y-auto space-y-4">
+        <h3 id="pmodal-title" class="font-display text-xl sm:text-2xl font-bold text-white"></h3>
+        <p id="pmodal-desc" class="text-xs sm:text-sm text-gray-300 leading-relaxed"></p>
+        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs">
+          <p class="text-gray-300"><strong class="text-emerald-400">Tujuan Pembuatan:</strong> <span id="pmodal-purpose"></span></p>
+          <p class="text-gray-300"><strong class="text-orange-400">Tools yang Digunakan:</strong> <span id="pmodal-tools"></span></p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <a id="pmodal-link" href="#" target="_blank" rel="noopener noreferrer" class="flex-1 py-3 px-4 rounded-xl bg-accent hover:bg-orange-600 text-white text-xs font-bold uppercase tracking-wider text-center transition">
+            Buka Link Demo / Hasil Akhir
+          </a>
+          <button type="button" onclick="closeProjectModal()" class="py-3 px-5 rounded-xl bg-white/10 hover:bg-white/15 text-gray-200 text-xs font-semibold transition">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 2: MONETIZATION JOURNEY (DOKUMENTASI AKADEMIK TERPISAH) ================= -->
+  <div id="journey-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-lg flex items-center justify-center p-3 sm:p-4">
+    <div class="glass-card max-w-3xl w-full rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-emerald-500/30 max-h-[90vh] overflow-y-auto space-y-5">
+      <div class="flex items-start justify-between gap-3 border-b border-white/10 pb-4">
+        <div>
+          <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
+            Academic & Monetization Documentation
+          </span>
+          <h3 class="font-display text-lg sm:text-2xl font-bold text-white mt-2">Monetization Journey & Perencanaan Tugas</h3>
+          <p class="text-xs text-gray-400 mt-0.5">Dipisahkan dari tampilan utama agar website tetap terlihat profesional bagi calon klien.</p>
+        </div>
+        <button type="button" onclick="toggleJourneyModal()" aria-label="Tutup Modal" class="p-2 rounded-lg bg-white/10 hover:bg-red-500/30 text-gray-300 shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-xs text-gray-200 leading-relaxed space-y-1.5">
+        <strong class="text-orange-400 block uppercase tracking-wider">📌 Catatan Hipotesis Harga Awal:</strong>
+        <p>
+          Harga yang tercantum pada bagian <em>Digital Products</em> (<strong>Template IG Carousel Travel Rp10.000–15.000</strong>, <strong>Video Cinematic Rp20.000–25.000</strong>, dan <strong>Website Portofolio Rp30.000</strong>) adalah <strong>hipotesis harga awal dari perencanaan tugas kuliah</strong>, bukan harga yang sudah terbukti menghasilkan penjualan tetap.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4 text-xs">
+        <div class="glass-panel p-4 rounded-2xl space-y-2">
+          <h4 class="font-bold uppercase tracking-wider text-emerald-400">1. Target Pengunjung Website</h4>
+          <ul class="space-y-1.5 text-gray-300 list-disc list-inside">
+            <li><strong>Kreator konten:</strong> Membutuhkan aset template & preset siap pakai.</li>
+            <li><strong>Fotografer pemula & Traveler:</strong> Referensi visual & <em>storytelling</em> alam.</li>
+            <li><strong>UMKM:</strong> Membutuhkan desain menu, poster promosi, & konten sosmed.</li>
+            <li><strong>Calon klien:</strong> Memesan jasa kreatif kustom.</li>
+          </ul>
+        </div>
+
+        <div class="glass-panel p-4 rounded-2xl space-y-2">
+          <h4 class="font-bold uppercase tracking-wider text-orange-400">2. Urutan Prioritas Pengerjaan</h4>
+          <ol class="space-y-1 text-gray-300 list-decimal list-inside">
+            <li><strong>Home:</strong> Identitas dan kesan pertama.</li>
+            <li><strong>Projects:</strong> Kumpulan semua karya (A, B, C).</li>
+            <li><strong>Digital Products:</strong> Aset yang bisa dimonetisasi berulang.</li>
+            <li><strong>Services:</strong> Jasa kreatif yang ditawarkan.</li>
+            <li><strong>About:</strong> Profil D4 Produksi Media dan kemampuan.</li>
+            <li><strong>Monetization Journey:</strong> Dokumentasi tugas kuliah (Panel ini).</li>
+            <li><strong>Contact:</strong> Jalur komunikasi dan pemesanan.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button type="button" onclick="toggleJourneyModal()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider transition">
+          Kembali ke Tampilan Profesional Klien
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC (100% SELF-CONTAINED & FAULT-TOLERANT) ================= -->
+  <script>
+    // Safe Icon Initialization
+    function safeCreateIcons() {
+      try {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+      } catch (err) {
+        // Ignore CDN icon errors so main scripts never halt
+      }
+    }
+
+    // Mobile Menu Logic
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    function closeMobileMenu() {
+      if (mobileMenu) mobileMenu.classList.add('hidden');
+    }
+
+    if (mobileBtn && mobileMenu) {
+      mobileBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
+
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', closeMobileMenu);
+    });
+
+    // Journey Modal Toggle
+    function toggleJourneyModal() {
+      const modal = document.getElementById('journey-modal');
+      if (modal) modal.classList.toggle('hidden');
+    }
+
+    // ---------------- 1. HERO SLIDER LOGIC (3 SLIDES WITH ANIMATION) ----------------
+    const heroSlides = [
+      {
+        bg: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1800&q=80",
+        subtitle: "CREATIVE DIGITAL PORTFOLIO • VISUAL STORYTELLING",
+        kicker: "LAZIB ABDULLAH — CREATIVE MEDIA & DIGITAL ASSET",
+        line1Html: '<span class="split-outline-text">TURNING</span> <span class="text-white">IDEAS</span>',
+        line2Text: "INTO VISUAL EXPERIENCES.",
+        desc: "Saya adalah mahasiswa D4 Produksi Media yang berfokus pada pengembangan karya kreatif melalui desain visual, fotografi, video cinematic, dan media digital."
+      },
+      {
+        bg: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1800&q=80",
+        subtitle: "LANDSCAPE PHOTOGRAPHY & CINEMATIC VIDEO",
+        kicker: "EXPLORING NATURE & VISUAL ATMOSPHERE",
+        line1Html: '<span class="split-outline-text">DISCOVER</span> <span class="text-white">THE WORLD,</span>',
+        line2Text: "ONE JOURNEY AT A TIME.",
+        desc: "Mengabadikan keindahan lanskap pegunungan, kabut hutan, dan perjalanan ekspedisi ke dalam fotografi serta video pendek berkarakter sinematik."
+      },
+      {
+        bg: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=1800&q=80",
+        subtitle: "DIGITAL PRODUCTS & CREATIVE SERVICES",
+        kicker: "SOLUSI KREATIF UNTUK KREATOR & UMKM",
+        line1Html: '<span class="split-outline-text">DIGITAL</span> <span class="text-white">ASSETS</span>',
+        line2Text: "& CREATIVE SOLUTIONS.",
+        desc: "Menyediakan aset digital siap pakai (Template IG Carousel Travel, Video Cinematic, Website Portofolio) serta layanan desain kustom."
+      }
+    ];
+
+    let currentHeroIdx = 0;
+
+    function setHeroSlide(index) {
+      currentHeroIdx = index;
+      const s = heroSlides[index];
+      const bgEl = document.getElementById('hero-bg');
+      const boxEl = document.getElementById('hero-content-box');
+
+      if (bgEl) bgEl.style.backgroundImage = `url('${s.bg}')`;
+      if (boxEl) {
+        boxEl.classList.remove('slide-fade-enter');
+        void boxEl.offsetWidth;
+        boxEl.classList.add('slide-fade-enter');
+      }
+
+      const subEl = document.getElementById('hero-subtitle');
+      const kickEl = document.getElementById('hero-kicker');
+      const l1El = document.getElementById('hero-line-1');
+      const l2El = document.getElementById('hero-line-2');
+      const descEl = document.getElementById('hero-desc');
+
+      if (subEl) subEl.textContent = s.subtitle;
+      if (kickEl) kickEl.textContent = s.kicker;
+      if (l1El) l1El.innerHTML = s.line1Html;
+      if (l2El) l2El.textContent = s.line2Text;
+      if (descEl) descEl.textContent = s.desc;
+
+      const diamonds = document.getElementById('hero-diamonds');
+      if (diamonds) {
+        Array.from(diamonds.children).forEach((btn, i) => {
+          btn.className = i === index
+            ? "w-3.5 h-3.5 rotate-45 bg-orange-500 transition-all scale-125 shadow-lg shadow-orange-500/50"
+            : "w-3.5 h-3.5 rotate-45 border border-white/70 hover:bg-white/40 transition-all";
+        });
+      }
+    }
+
+    function changeHeroSlide(dir) {
+      currentHeroIdx = (currentHeroIdx + dir + heroSlides.length) % heroSlides.length;
+      setHeroSlide(currentHeroIdx);
+    }
+
+    // ---------------- 2. ULTRA-SMOOTH 60FPS 3D PERSPECTIVE CAROUSEL ----------------
+    const showcase3DCards = [
+      {
+        title: "TEMPLATE AIR TERJUN 7 SLIDE",
+        tag: "#A. Digital Design",
+        sub: "Discover the world, one journey at a time — Template IG Carousel Travel",
+        img: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=900&q=80",
+        projectIndex: 0
+      },
+      {
+        title: "LANDSCAPE PEGUNUNGAN",
+        tag: "#B. Photography & Cinematic",
+        sub: "Eksplorasi visual kabut pagi & siluet pegunungan beresolusi tinggi",
+        img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
+        projectIndex: 7
+      },
+      {
+        title: "CINEMATIC REELS & GRADING",
+        tag: "#B. Photography & Cinematic",
+        sub: "Visual storytelling perjalanan dengan nuansa warna forest moody",
+        img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80",
+        projectIndex: 8
+      },
+      {
+        title: "DARK PORTFOLIO WEBSITE",
+        tag: "#C. Digital Platform",
+        sub: "Website personal branding modern dengan interaksi 3D & katalog produk",
+        img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=900&q=80",
+        projectIndex: 10
+      },
+      {
+        title: "DESAIN KATALOG & MENU UMKM",
+        tag: "#A. Digital Design",
+        sub: "Solusi tata letak promosi produk kuliner dan minuman yang estetik",
+        img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80",
+        projectIndex: 2
+      }
+    ];
+
+    let active3DIdx = 0;
+    let c3dCardElements = [];
+    const stage3DEl = document.getElementById('carousel-3d');
+    const c3dDotsEl = document.getElementById('c3d-dots');
+
+    function init3DCarouselDOM() {
+      if (!stage3DEl || !c3dDotsEl) return;
+      stage3DEl.innerHTML = '';
+      c3dDotsEl.innerHTML = '';
+      c3dCardElements = [];
+
+      showcase3DCards.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'carousel-card-3d bg-gradient-to-br from-emerald-950 via-slate-900 to-neutral-950';
+        card.innerHTML = `
+          <img src="${item.img}" alt="${item.title}" onerror="this.style.opacity='0'" class="w-full h-full object-cover pointer-events-none select-none" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent pointer-events-none"></div>
+          <div class="card-badge absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-[10px] text-white font-semibold">
+            Detail
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          if (isDragging3D) return;
+          if (index === active3DIdx) {
+            openProjectModal(item.projectIndex);
+          } else {
+            active3DIdx = index;
+            update3DCarouselPositions(0, true);
+          }
+        });
+
+        stage3DEl.appendChild(card);
+        c3dCardElements.push(card);
+
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.setAttribute('aria-label', `Slide ${index + 1}`);
+        dot.onclick = () => {
+          active3DIdx = index;
+          update3DCarouselPositions(0, true);
+        };
+        c3dDotsEl.appendChild(dot);
+      });
+
+      update3DCarouselPositions(0, false);
+    }
+
+    function update3DCarouselPositions(dragFraction = 0, animateCaption = false) {
+      if (!c3dCardElements.length) return;
+      const total = showcase3DCards.length;
+      const isMobile = window.innerWidth < 640;
+      const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
+
+      const stepX = isMobile ? 60 : (isTablet ? 130 : 175);
+      const stepZ = isMobile ? 90 : 140;
+      const rotAngle = isMobile ? -12 : -18;
+
+      c3dCardElements.forEach((card, index) => {
+        let baseOffset = index - active3DIdx;
+        if (baseOffset > Math.floor(total / 2)) baseOffset -= total;
+        if (baseOffset < -Math.floor(total / 2)) baseOffset += total;
+
+        const effectiveOffset = baseOffset + dragFraction;
+        const absOffset = Math.abs(effectiveOffset);
+
+        const translateX = effectiveOffset * stepX;
+        const translateZ = -absOffset * stepZ;
+        const rotateY = effectiveOffset * rotAngle;
+        const scale = Math.max(0.75, 1 - absOffset * 0.1);
+        const opacity = absOffset > 2.3 ? 0 : Math.max(0.22, 1 - absOffset * 0.3);
+        const blurPx = absOffset < 0.25 ? 0 : Math.min(3.5, absOffset * 1.2);
+        const zIndex = Math.round(30 - absOffset * 10);
+
+        card.style.transform = `translate3d(${translateX}px, 0px, ${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
+        card.style.opacity = opacity;
+        card.style.filter = `blur(${blurPx}px) brightness(${1 - absOffset * 0.16})`;
+        card.style.zIndex = zIndex;
+
+        const badge = card.querySelector('.card-badge');
+        if (baseOffset === 0) {
+          card.classList.add('is-active-card');
+          if (badge) badge.textContent = 'Klik Detail';
+        } else {
+          card.classList.remove('is-active-card');
+          if (badge) badge.textContent = 'Geser';
+        }
+      });
+
+      if (c3dDotsEl) {
+        Array.from(c3dDotsEl.children).forEach((dot, idx) => {
+          dot.className = idx === active3DIdx
+            ? 'h-2 w-6 rounded-full bg-orange-500 transition-all duration-300'
+            : 'h-2 w-2 rounded-full bg-white/30 hover:bg-white/60 transition-all duration-300';
+        });
+      }
+
+      const activeItem = showcase3DCards[active3DIdx];
+      const captionBox = document.getElementById('c3d-caption-box');
+      if (animateCaption && captionBox) {
+        captionBox.classList.remove('caption-animate');
+        void captionBox.offsetWidth;
+        captionBox.classList.add('caption-animate');
+      }
+      const tagEl = document.getElementById('c3d-tag');
+      const titleEl = document.getElementById('c3d-title');
+      const subEl = document.getElementById('c3d-sub');
+      if (tagEl) tagEl.textContent = activeItem.tag;
+      if (titleEl) titleEl.textContent = activeItem.title;
+      if (subEl) subEl.textContent = activeItem.sub;
+    }
+
+    function move3DCarousel(dir) {
+      active3DIdx = (active3DIdx + dir + showcase3DCards.length) % showcase3DCards.length;
+      update3DCarouselPositions(0, true);
+    }
+
+    // Drag & Touch Swipe Physics for 3D Carousel
+    let isPointerDown3D = false;
+    let isDragging3D = false;
+    let startX3D = 0;
+    let currentDeltaX3D = 0;
+
+    function handle3DStart(clientX) {
+      isPointerDown3D = true;
+      isDragging3D = false;
+      startX3D = clientX;
+      currentDeltaX3D = 0;
+      c3dCardElements.forEach(c => c.classList.add('is-dragging'));
+    }
+
+    function handle3DMove(clientX) {
+      if (!isPointerDown3D) return;
+      currentDeltaX3D = clientX - startX3D;
+      if (Math.abs(currentDeltaX3D) > 8) {
+        isDragging3D = true;
+      }
+      const dragFraction = Math.max(-1.1, Math.min(1.1, currentDeltaX3D / 160));
+      update3DCarouselPositions(dragFraction, false);
+    }
+
+    function handle3DEnd() {
+      if (!isPointerDown3D) return;
+      isPointerDown3D = false;
+      c3dCardElements.forEach(c => c.classList.remove('is-dragging'));
+
+      if (Math.abs(currentDeltaX3D) > 38) {
+        move3DCarousel(currentDeltaX3D < 0 ? 1 : -1);
+      } else {
+        update3DCarouselPositions(0, false);
+      }
+      setTimeout(() => { isDragging3D = false; }, 50);
+    }
+
+    if (stage3DEl) {
+      stage3DEl.addEventListener('mousedown', (e) => handle3DStart(e.clientX));
+      window.addEventListener('mousemove', (e) => handle3DMove(e.clientX));
+      window.addEventListener('mouseup', handle3DEnd);
+
+      stage3DEl.addEventListener('touchstart', (e) => handle3DStart(e.touches[0].clientX), { passive: true });
+      stage3DEl.addEventListener('touchmove', (e) => handle3DMove(e.touches[0].clientX), { passive: true });
+      stage3DEl.addEventListener('touchend', handle3DEnd, { passive: true });
+    }
+
+    window.addEventListener('resize', () => update3DCarouselPositions(0, false));
+
+    // ---------------- 3. COMPLETE 13 PROJECTS GALLERY + SMOOTH HORIZONTAL SLIDER ----------------
+    const allProjectsData = [
+      // A. Digital Design (6 Projects)
+      {
+        category: "design",
+        catLabel: "A. Digital Design",
+        title: "Template Instagram Carousel Travel",
+        desc: "Rangkaian 7 slide microblog bertema air terjun dan alam ('Calm Outside', 'Peacefully Place', 'Discover the World') dengan UI kartu glassmorphism.",
+        purpose: "Membantu kreator konten dan traveler menyajikan cerita perjalanan secara estetik dan meningkatkan interaksi audiens.",
+        tools: "Canva, Visual Layouting, Glassmorphism UI",
+        img: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=800&q=80",
+        link: "https://lynk.id/zibbbbit__"
+      },
+      {
+        category: "design",
+        catLabel: "A. Digital Design",
+        title: "Poster Promosi Digital",
+        desc: "Karya poster kampanye kegiatan perjalanan dan promosi produk dengan komposisi tipografi kontras dan atmosferik.",
+        purpose: "Menyampaikan informasi promosi secara cepat dan memikat perhatian audiens di media sosial.",
+        tools: "Canva, Typography & Color Grading",
+        img: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
+        link: "https://lynk.id/zibbbbit__"
+      },
+      {
+        category: "design",
+        catLabel: "A. Digital Design",
+        title: "Desain Menu Makanan dan Minuman",
+        desc: "Tata letak katalog menu kuliner & kedai kopi untuk UMKM dengan pengelompokan produk dan harga yang rapi.",
+        purpose: "Meningkatkan daya tarik visual produk UMKM dan memudahkan pelanggan memilih menu.",
+        tools: "Canva, Editorial Grid System",
+        img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80",
+        link: "https://lynk.id/zibbbbit__"
+      },
+      {
+        category: "design",
+        catLabel: "A. Digital Design",
+        title: "Infografis Edukasi & Media",
+        desc: "Penyajian data, langkah-langkah panduan, dan rangkuman materi ke dalam elemen grafik visual yang terstruktur.",
+        purpose: "Memudahkan pembaca memahami informasi kompleks hanya dalam satu tampilan ringkas.",
+        tools: "Canva, Information Design",
+        img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+        link: "https://lynk.id/zibbbbit__"
+      },
+      {
+        category: "design",
+        catLabel: "A. Digital Design",
+        title: "Template Presentasi Kreatif",
+        desc: "Slide deck presentasi bertema dark minimalist untuk kebutuhan pemaparan materi kuliah, pitch deck, dan portofolio.",
+        purpose: "Memberikan tampilan presentasi yang profesional, konsisten, dan tidak membosankan.",
+        tools: "Canva Presentation, Visual Hierarchy",
+        img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+        link: "https://lynk.id/zibbbbit__"
+      },
+      {
+        category: "design",
+        catLabel: "A. Digital Design",
+        title: "Desain Konten Media Sosial",
+        desc: "Rangkaian desain konten harian (feed & story) yang dirancang seragam mengikuti identitas warna brand.",
+        purpose: "Menjaga konsistensi tampilan akun media sosial kreator maupun bisnis UMKM.",
+        tools: "Canva, Social Media Kit",
+        img: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=800&q=80",
+        link: "https://instagram.com/lazibabdullah__"
+      },
+
+      // B. Photography & Cinematic (4 Projects)
+      {
+        category: "photo",
+        catLabel: "B. Photography & Cinematic",
+        title: "Foto Perjalanan (Travel Photography)",
+        desc: "Kumpulan potret eksplorasi destinasi wisata, interaksi manusia dengan alam, dan suasana perjalanan.",
+        purpose: "Membangun narasi visual (visual storytelling) dari setiap tempat yang dikunjungi.",
+        tools: "Mobile/Mirrorless Photography, Lightroom",
+        img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+        link: "https://instagram.com/lazibabdullah__"
+      },
+      {
+        category: "photo",
+        catLabel: "B. Photography & Cinematic",
+        title: "Foto Landscape Pegunungan",
+        desc: "Fotografi bentang alam pegunungan, kabut hutan, dan pencahayaan golden hour dengan komposisi berlapis.",
+        purpose: "Menampilkan keindahan suasana pegunungan sekaligus menjadi aset visual beresolusi tinggi.",
+        tools: "Landscape Composition, Color Grading",
+        img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+        link: "https://instagram.com/lazibabdullah__"
+      },
+      {
+        category: "photo",
+        catLabel: "B. Photography & Cinematic",
+        title: "Video Cinematic Alam & Perjalanan",
+        desc: "Karya video pendek dengan pergerakan kamera stabil, pemilihan musik atmosferik, dan color grading filmis.",
+        purpose: "Menghadirkan pengalaman audiovisual sinematik untuk platform Reels, TikTok, dan YouTube.",
+        tools: "CapCut, Cinematic Color Grading, Sound Design",
+        img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+        link: "https://tiktok.com/@forntght4"
+      },
+      {
+        category: "photo",
+        catLabel: "B. Photography & Cinematic",
+        title: "Dokumentasi Perjalanan & Ekspedisi",
+        desc: "Rangkaian dokumentasi kronologis kegiatan luar ruang dari tahap persiapan hingga mencapai puncak tujuan.",
+        purpose: "Menyimpan arsip perjalanan yang utuh dan autentik bagi komunitas maupun klien.",
+        tools: "Action & Mobile Cam, Storyline Editing",
+        img: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80",
+        link: "https://tiktok.com/@forntght4"
+      },
+
+      // C. Digital Platform (3 Projects)
+      {
+        category: "platform",
+        catLabel: "C. Digital Platform",
+        title: "Website Portofolio Creative Digital",
+        desc: "Website portofolio berkonsep Dark Minimalist dengan efek 3D slider, galeri filter, dan toko produk digital.",
+        purpose: "Menjadi rumah digital profesional untuk menampilkan karya dan menerima pesanan klien.",
+        tools: "HTML5, Tailwind CSS, JavaScript 3D",
+        img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+        link: "#home"
+      },
+      {
+        category: "platform",
+        catLabel: "C. Digital Platform",
+        title: "Desain Website Menggunakan Canva / Framer",
+        desc: "Perancangan antarmuka landing page modern yang mudah dikustomisasi untuk kebutuhan personal branding.",
+        purpose: "Memungkinkan pembuatan website portofolio secara cepat dan efisien tanpa kendala teknis.",
+        tools: "Canva Website, Framer UI Layout",
+        img: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80",
+        link: "https://lynk.id/zibbbbit__"
+      },
+      {
+        category: "platform",
+        catLabel: "C. Digital Platform",
+        title: "Mockup Tampilan Produk Digital",
+        desc: "Visualisasi kemasan produk digital (template carousel, preset video, dan web UI) dalam perangkat 3D.",
+        purpose: "Meningkatkan daya tarik dan kepercayaan calon pembeli saat melihat katalog produk di Lynk.id.",
+        tools: "Canva Mockup Studio, Product Presentation",
+        img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
+        link: "https://lynk.id/zibbbbit__"
+      }
+    ];
+
+    const projectsGridEl = document.getElementById('projects-grid');
+    let isSliderMode = true;
+    let currentFilterCategory = 'all';
+
+    function renderProjectsGrid(filter = 'all') {
+      if (!projectsGridEl) return;
+      currentFilterCategory = filter;
+      projectsGridEl.innerHTML = '';
+
+      let visibleOrder = 0;
+      allProjectsData.forEach((proj, idx) => {
+        if (filter !== 'all' && proj.category !== filter) return;
+
+        const card = document.createElement('div');
+        const modeClass = isSliderMode ? 'project-slide-item' : '';
+        card.className = `${modeClass} glass-card rounded-3xl overflow-hidden flex flex-col justify-between tilt-card card-enter-anim`;
+        card.style.animationDelay = `${visibleOrder * 65}ms`;
+        visibleOrder++;
+
+        card.innerHTML = `
+          <div>
+            <div class="relative h-44 sm:h-48 overflow-hidden group cursor-pointer bg-gradient-to-br from-emerald-950 via-slate-900 to-neutral-950" onclick="openProjectModal(${idx})">
+              <img src="${proj.img}" alt="${proj.title}" onerror="this.style.opacity='0'" class="w-full h-full object-cover group-hover:scale-110 transition duration-700 pointer-events-none" />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#070b09] via-black/20 to-transparent"></div>
+              <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-[10px] font-bold uppercase tracking-wider text-emerald-300">
+                ${proj.catLabel}
+              </span>
+              <span class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-orange-500 text-white text-[10px] font-bold uppercase tracking-wider opacity-90 group-hover:opacity-100 transition">
+                Detail
+              </span>
+            </div>
+
+            <div class="p-5 sm:p-6 space-y-2.5">
+              <h3 class="font-display font-bold text-base sm:text-lg text-white leading-snug">${proj.title}</h3>
+              <p class="text-xs text-gray-300 leading-relaxed">${proj.desc}</p>
+              
+              <div class="pt-2.5 border-t border-white/10 space-y-1.5 text-[11px]">
+                <p class="text-gray-400"><strong class="text-white">Tujuan:</strong> ${proj.purpose}</p>
+                <p class="text-gray-400"><strong class="text-orange-400">Tools:</strong> ${proj.tools}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="px-5 pb-5 sm:px-6 sm:pb-6 flex items-center gap-2">
+            <button type="button" onclick="openProjectModal(${idx})" class="flex-1 py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition">
+              Preview Karya
+            </button>
+            <a href="${proj.link}" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3.5 rounded-xl bg-accent hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-1.5 transition">
+              <span>Demo</span>
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            </a>
+          </div>
+        `;
+        projectsGridEl.appendChild(card);
+      });
+
+      safeCreateIcons();
+      init3DTiltCards();
+
+      if (isSliderMode) {
+        projectsGridEl.scrollTo({ left: 0, behavior: 'smooth' });
+        setTimeout(updateGalleryScrollProgress, 120);
+      }
+    }
+
+    // Smooth Horizontal Scroll Controls for Gallery Track
+    function scrollGalleryTrack(direction) {
+      if (!isSliderMode || !projectsGridEl) return;
+      const step = window.innerWidth < 640 ? 295 : 365;
+      projectsGridEl.scrollBy({
+        left: direction * step,
+        behavior: 'smooth'
+      });
+    }
+
+    function updateGalleryScrollProgress() {
+      if (!isSliderMode || !projectsGridEl) return;
+      const maxScroll = projectsGridEl.scrollWidth - projectsGridEl.clientWidth;
+      const currentScroll = projectsGridEl.scrollLeft;
+      const pct = maxScroll > 0 ? Math.max(15, Math.min(100, (currentScroll / maxScroll) * 100)) : 100;
+      const bar = document.getElementById('gallery-progress-bar');
+      if (bar) bar.style.width = `${pct}%`;
+    }
+
+    if (projectsGridEl) {
+      projectsGridEl.addEventListener('scroll', updateGalleryScrollProgress, { passive: true });
+
+      // Mouse Drag-to-Scroll for Desktop Horizontal Gallery
+      let isDownGallery = false;
+      let startXGallery = 0;
+      let scrollLeftGallery = 0;
+
+      projectsGridEl.addEventListener('mousedown', (e) => {
+        if (!isSliderMode) return;
+        isDownGallery = true;
+        projectsGridEl.classList.add('dragging-track');
+        startXGallery = e.pageX - projectsGridEl.offsetLeft;
+        scrollLeftGallery = projectsGridEl.scrollLeft;
+      });
+
+      projectsGridEl.addEventListener('mouseleave', () => {
+        isDownGallery = false;
+        projectsGridEl.classList.remove('dragging-track');
+      });
+
+      projectsGridEl.addEventListener('mouseup', () => {
+        isDownGallery = false;
+        projectsGridEl.classList.remove('dragging-track');
+      });
+
+      projectsGridEl.addEventListener('mousemove', (e) => {
+        if (!isDownGallery || !isSliderMode) return;
+        e.preventDefault();
+        const x = e.pageX - projectsGridEl.offsetLeft;
+        const walk = (x - startXGallery) * 1.5;
+        projectsGridEl.scrollLeft = scrollLeftGallery - walk;
+      });
+    }
+
+    function toggleGalleryLayout() {
+      if (!projectsGridEl) return;
+      isSliderMode = !isSliderMode;
+      const labelEl = document.getElementById('layout-label');
+      const arrowsEl = document.getElementById('gallery-slider-arrows');
+      const progressWrap = document.getElementById('gallery-progress-wrap');
+
+      if (isSliderMode) {
+        projectsGridEl.className = 'projects-slider-track no-scrollbar perspective-stage';
+        if (labelEl) labelEl.textContent = 'Tampilkan Semua (Grid)';
+        if (arrowsEl) arrowsEl.classList.remove('hidden');
+        if (progressWrap) progressWrap.classList.remove('hidden');
+      } else {
+        projectsGridEl.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 perspective-stage';
+        if (labelEl) labelEl.textContent = 'Mode Geser (Slider)';
+        if (arrowsEl) arrowsEl.classList.add('hidden');
+        if (progressWrap) progressWrap.classList.add('hidden');
+      }
+      renderProjectsGrid(currentFilterCategory);
+    }
+
+    function filterProjects(category) {
+      document.querySelectorAll('.proj-tab').forEach(btn => {
+        if (btn.dataset.filter === category) {
+          btn.className = "proj-tab shrink-0 px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-accent text-white transition shadow-lg shadow-orange-500/25";
+        } else {
+          btn.className = "proj-tab shrink-0 px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider glass-panel hover:bg-white/10 text-gray-300 transition";
+        }
+      });
+      renderProjectsGrid(category);
+    }
+
+    // Project Detail Modal Functions
+    function openProjectModal(index) {
+      const proj = allProjectsData[index];
+      if (!proj) return;
+      const modal = document.getElementById('project-modal');
+      document.getElementById('pmodal-img').src = proj.img;
+      document.getElementById('pmodal-cat').textContent = proj.catLabel;
+      document.getElementById('pmodal-title').textContent = proj.title;
+      document.getElementById('pmodal-desc').textContent = proj.desc;
+      document.getElementById('pmodal-purpose').textContent = proj.purpose;
+      document.getElementById('pmodal-tools').textContent = proj.tools;
+      document.getElementById('pmodal-link').href = proj.link;
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeProjectModal() {
+      const modal = document.getElementById('project-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // ---------------- 4. 3D INTERACTIVE MOUSE TILT EFFECT (Desktop Only) ----------------
+    function init3DTiltCards() {
+      if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return;
+      const cards = document.querySelectorAll('.tilt-card');
+      cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -4.5;
+          const rotateY = ((x - centerX) / centerX) * 4.5;
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        });
+      });
+    }
+
+    // ---------------- 5. SAFE SCROLL REVEAL INITIALIZATION ----------------
+    function initScrollReveal() {
+      const reveals = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        document.body.classList.add('js-anim-ready');
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('active');
+            }
+          });
+        }, { threshold: 0.08 });
+
+        reveals.forEach(el => revealObserver.observe(el));
+
+        // Fail-safe: ensure elements in viewport are visible immediately
+        setTimeout(() => {
+          reveals.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight) {
+              el.classList.add('active');
+            }
+          });
+        }, 200);
+      } else {
+        reveals.forEach(el => el.classList.add('active'));
+      }
+    }
+
+    // Boot Everything Immediately on DOM Ready
+    function bootPortfolioApp() {
+      safeCreateIcons();
+      init3DCarouselDOM();
+      renderProjectsGrid('all');
+      init3DTiltCards();
+      initScrollReveal();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootPortfolioApp);
+    } else {
+      bootPortfolioApp();
+    }
+  </script>
+</body>
+</html>
